@@ -31,7 +31,11 @@
                 commitsList.innerHTML = '';
                 commits.forEach(commit => {
                     const listItem = document.createElement('li');
-                    listItem.textContent = `${commit.commit.message} by ${commit.commit.author.name}`;
+                    const commitLink = document.createElement('a');
+                    commitLink.href = commit.html_url;
+                    commitLink.target = '_blank';
+                    commitLink.textContent = `${commit.commit.message} by ${commit.commit.author.name}`;
+                    listItem.appendChild(commitLink);
                     commitsList.appendChild(listItem);
                 });
             } catch (error) {
