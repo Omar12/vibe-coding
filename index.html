@@ -13,7 +13,9 @@
             <input type="text" id="repoUrl" class="w-full p-2 border border-gray-300 rounded mb-2" placeholder="Enter GitHub repo URL" required>
             <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded">Get Commits</button>
         </form>
-        <ul id="commitsList" class="list-disc pl-5"></ul>
+        <div id="commitsContainer" class="p-4 bg-gray-50 rounded-lg">
+            <ul id="commitsList" class="list-disc pl-5 text-lg"></ul>
+        </div>
     </div>
 
     <script>
