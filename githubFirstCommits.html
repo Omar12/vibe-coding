@@ -23,15 +23,35 @@
             event.preventDefault();
             const repoUrl = document.getElementById('repoUrl').value;
             const repoPath = new URL(repoUrl).pathname.slice(1);
-            const apiUrl = `https://api.github.com/repos/${repoPath}/commits?per_page=5`;
+            const commitsList = document.getElementById('commitsList');
+            commitsList.innerHTML = '<li>Loading...</li>';
 
             try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) throw new Error('Failed to fetch commits');
-                const commits = await response.json();
-                const commitsList = document.getElementById('commitsList');
+                // First, get the total count of commits by fetching with per_page=1
+                const firstResponse = await fetch(`https://api.github.com/repos/${repoPath}/commits?per_page=1`);
+                if (!firstResponse.ok) throw new Error('Failed to fetch commits');
+
+                // Get the Link header to find the last page
+                const linkHeader = firstResponse.headers.get('Link');
+                let lastPage = 1;
+
+                if (linkHeader) {
+                    const lastPageMatch = linkHeader.match(/page=(\d+)>; rel="last"/);
+                    if (lastPageMatch) {
+                        lastPage = parseInt(lastPageMatch[1]);
+                    }
+                }
+
+                // Fetch the last page (oldest commits)
+                const lastPageResponse = await fetch(`https://api.github.com/repos/${repoPath}/commits?per_page=100&page=${lastPage}`);
+                if (!lastPageResponse.ok) throw new Error('Failed to fetch oldest commits');
+                const allCommitsOnLastPage = await lastPageResponse.json();
+
+                // Get the first 5 commits (oldest to newest)
+                const firstFiveCommits = allCommitsOnLastPage.slice(0, 5);
+
                 commitsList.innerHTML = '';
-                commits.forEach(commit => {
+                firstFiveCommits.forEach(commit => {
                     const listItem = document.createElement('li');
                     const commitLink = document.createElement('a');
                     commitLink.href = commit.html_url;
@@ -41,6 +61,7 @@
                     commitsList.appendChild(listItem);
                 });
             } catch (error) {
+                commitsList.innerHTML = '';
                 alert('Error fetching commits: ' + error.message);
             }
         });

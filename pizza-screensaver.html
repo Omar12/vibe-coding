@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizza Space Screensaver</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            overflow: hidden;
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+            cursor: none;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .pizza {
+            position: absolute;
+            font-size: 60px;
+            animation: float 8s linear infinite;
+            transform-origin: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateX(-100px) translateY(0) rotate(0deg);
+            }
+            100% {
+                transform: translateX(calc(100vw + 100px)) translateY(0) rotate(360deg);
+            }
+        }
+
+        .pizza.slow {
+            animation-duration: 12s;
+        }
+
+        .pizza.fast {
+            animation-duration: 6s;
+        }
+
+        .pizza.large {
+            font-size: 80px;
+        }
+
+        .pizza.small {
+            font-size: 40px;
+        }
+
+        .title {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #FFD700;
+            font-family: 'Courier New', monospace;
+            font-size: 24px;
+            text-shadow: 0 0 20px #FFD700;
+            animation: glow 2s ease-in-out infinite alternate;
+            z-index: 1000;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px #FFD700; }
+            to { text-shadow: 0 0 30px #FFD700, 0 0 40px #FFD700; }
+        }
+    </style>
+</head>
+<body>
+    <div class="title">🍕 PIZZA SPACE SCREENSAVER 🍕</div>
+    <div class="stars"></div>
+
+    <script>
+        // Create stars
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 2 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Create floating pizza
+        function createPizza() {
+            const pizza = document.createElement('div');
+            pizza.className = 'pizza';
+            pizza.textContent = '🍕';
+            
+            // Random size
+            const sizes = ['small', '', 'large'];
+            const randomSize = sizes[Math.floor(Math.random() * sizes.length)];
+            if (randomSize) pizza.classList.add(randomSize);
+            
+            // Random speed
+            const speeds = ['slow', '', 'fast'];
+            const randomSpeed = speeds[Math.floor(Math.random() * speeds.length)];
+            if (randomSpeed) pizza.classList.add(randomSpeed);
+            
+            // Random vertical position
+            pizza.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+            
+            // Random animation delay
+            pizza.style.animationDelay = Math.random() * 3 + 's';
+            
+            document.body.appendChild(pizza);
+            
+            // Remove pizza after animation completes
+            const duration = pizza.classList.contains('slow') ? 12000 : 
+                           pizza.classList.contains('fast') ? 6000 : 8000;
+            setTimeout(() => {
+                if (pizza.parentNode) {
+                    pizza.parentNode.removeChild(pizza);
+                }
+            }, duration + 3000);
+        }
+
+        // Initialize
+        createStars();
+        
+        // Create initial pizzas
+        for (let i = 0; i < 3; i++) {
+            setTimeout(createPizza, i * 1000);
+        }
+        
+        // Continue creating pizzas
+        setInterval(createPizza, 2000);
+        
+        // Prevent screensaver from being interrupted by mouse movement
+        document.addEventListener('mousemove', (e) => {
+            e.preventDefault();
+        });
+        
+        // Exit on key press or click
+        document.addEventListener('keydown', () => {
+            document.body.style.background = 'black';
+            document.body.innerHTML = '<div style="color: white; text-align: center; margin-top: 50vh; font-family: monospace;">Screensaver ended. Press F11 to go fullscreen again.</div>';
+        });
+        
+        document.addEventListener('click', () => {
+            document.body.style.background = 'black';
+            document.body.innerHTML = '<div style="color: white; text-align: center; margin-top: 50vh; font-family: monospace;">Screensaver ended. Press F11 to go fullscreen again.</div>';
+        });
+    </script>
+</body>
+</html>

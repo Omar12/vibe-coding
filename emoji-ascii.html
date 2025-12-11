@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Emoji ASCII Letter Art</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      color-scheme: light dark;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      background: #0f172a;
+      color: #e5e7eb;
+    }
+
+    h1 {
+      font-size: 1.2rem;
+      margin-bottom: 0.75rem;
+      text-align: center;
+    }
+
+    .app {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #020617;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      border: 1px solid #1f2937;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .row .field {
+      flex: 1 1 120px;
+    }
+
+    .emoji-input {
+      font-size: 1.4rem;
+      text-align: center;
+    }
+
+    .emoji-input.active {
+      outline: 2px solid #22c55e;
+      outline-offset: 1px;
+    }
+
+    button {
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      background: #22c55e;
+      color: #022c22;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-top: 4px;
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    button.secondary {
+      width: 100%;
+      background: #1e40af;
+      color: #e5e7eb;
+      margin-top: 8px;
+    }
+
+    .swap-btn {
+      width: 100%;
+      padding: 8px;
+      font-size: 0.85rem;
+      background: #0f172a;
+      color: #e5e7eb;
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      margin-top: 18px;
+    }
+
+    .swap-btn:active {
+      transform: scale(0.97);
+    }
+
+    .emoji-picker-wrapper {
+      margin-top: 4px;
+      border-radius: 10px;
+      border: 1px solid #111827;
+      background: #020617;
+      padding: 8px;
+    }
+
+    .emoji-picker-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: #9ca3af;
+      margin-bottom: 6px;
+    }
+
+    .emoji-picker-header span.selected-target {
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .emoji-picker-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .emoji-picker-btn {
+      border: 1px solid #1f2937;
+      background: #020617;
+      border-radius: 8px;
+      padding: 4px 6px;
+      font-size: 1.2rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .emoji-picker-btn:active {
+      transform: scale(0.95);
+      background: #111827;
+    }
+
+    .output-wrapper {
+      margin-top: 16px;
+    }
+
+    .output-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+      font-size: 0.85rem;
+      color: #9ca3af;
+    }
+
+    pre {
+      margin: 0;
+      margin-top: 6px;
+      padding: 10px;
+      border-radius: 10px;
+      background: #020617;
+      border: 1px solid #111827;
+      font-family: "Menlo", "SF Mono", ui-monospace, monospace;
+      font-size: 1.5rem;
+      line-height: 1.1;
+      white-space: pre;           /* preserve spacing */
+      overflow-x: auto;
+    }
+
+    .hint {
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      font-size: 0.75rem;
+      background: #020617;
+    }
+
+    .pill span {
+      font-size: 0.9rem;
+    }
+
+    .toast {
+      position: fixed;
+      inset-inline: 0;
+      bottom: 24px;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .toast-inner {
+      pointer-events: auto;
+      background: #22c55e;
+      color: #052e16;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Emoji Letter Art</h1>
+
+    <div class="row">
+      <div class="field" style="flex: 2">
+        <label for="textInput">Text (A–Z, numbers, spaces)</label>
+        <input id="textInput" type="text" placeholder="HELLO" value="HELLO" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label for="fgEmoji">Emoji 1 (foreground)</label>
+        <input id="fgEmoji" type="text" maxlength="4" class="emoji-input" value="🟦" />
+      </div>
+      <div class="field">
+        <label for="bgEmoji">Emoji 2 (background)</label>
+        <input id="bgEmoji" type="text" maxlength="4" class="emoji-input" value="⬛️" />
+      </div>
+      <div class="field" style="flex: 0 0 120px; align-self: flex-end;">
+        <button type="button" id="swapBtn" class="swap-btn">Swap</button>
+      </div>
+    </div>
+
+    <div class="emoji-picker-wrapper">
+      <div class="emoji-picker-header">
+        <span>Emoji picker (applies to: <span id="pickerTargetLabel" class="selected-target">Emoji 1</span>)</span>
+        <span>Tap an emoji to set the selected field</span>
+      </div>
+      <div class="emoji-picker-grid" id="emojiPicker">
+        <!-- Blocks / shapes -->
+        <button type="button" class="emoji-picker-btn">🟥</button>
+        <button type="button" class="emoji-picker-btn">🟧</button>
+        <button type="button" class="emoji-picker-btn">🟨</button>
+        <button type="button" class="emoji-picker-btn">🟩</button>
+        <button type="button" class="emoji-picker-btn">🟦</button>
+        <button type="button" class="emoji-picker-btn">🟪</button>
+        <button type="button" class="emoji-picker-btn">⬛️</button>
+        <button type="button" class="emoji-picker-btn">⬜️</button>
+        <button type="button" class="emoji-picker-btn">◼️</button>
+        <button type="button" class="emoji-picker-btn">◻️</button>
+        <!-- Hearts / stars / fun -->
+        <button type="button" class="emoji-picker-btn">❤️</button>
+        <button type="button" class="emoji-picker-btn">🧡</button>
+        <button type="button" class="emoji-picker-btn">💛</button>
+        <button type="button" class="emoji-picker-btn">💚</button>
+        <button type="button" class="emoji-picker-btn">💙</button>
+        <button type="button" class="emoji-picker-btn">💜</button>
+        <button type="button" class="emoji-picker-btn">⭐️</button>
+        <button type="button" class="emoji-picker-btn">✨</button>
+        <button type="button" class="emoji-picker-btn">🔥</button>
+        <!-- Themed / random -->
+        <button type="button" class="emoji-picker-btn">🌙</button>
+        <button type="button" class="emoji-picker-btn">🌟</button>
+        <button type="button" class="emoji-picker-btn">🌈</button>
+        <button type="button" class="emoji-picker-btn">🌊</button>
+        <button type="button" class="emoji-picker-btn">🪐</button>
+        <button type="button" class="emoji-picker-btn">👾</button>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top: 12px;">
+      <div class="field">
+        <label for="layoutSelect">Layout</label>
+        <select id="layoutSelect">
+          <option value="horizontal">Horizontal (word in one line)</option>
+          <option value="vertical" selected>Vertical (letters stacked)</option>
+        </select>
+      </div>
+    </div>
+
+    <button id="generateBtn">Generate Art</button>
+    <button id="copyBtn" class="secondary">Copy to clipboard</button>
+
+    <div class="output-wrapper">
+      <div class="output-label">
+        <span>Preview</span>
+        <span class="pill">
+          <span>Tip:</span> select + paste into Messages
+        </span>
+      </div>
+      <pre id="output"></pre>
+      <div class="hint">
+        On iPhone, press and hold to select the art, drag to select all, then tap <strong>Copy</strong> and paste into Messages.
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" style="display:none;">
+    <div class="toast-inner">Copied!</div>
+  </div>
+
+  <script>
+    // 7x5 block font for A–Z and digits using simple X / space patterns
+    const LETTER_PATTERNS = {
+      "A": [
+        "  X  ",
+        " X X ",
+        "X   X",
+        "XXXXX",
+        "X   X",
+        "X   X",
+        "X   X",
+      ],
+      "B": [
+        "XXXX ",
+        "X   X",
+        "X   X",
+        "XXXX ",
+        "X   X",
+        "X   X",
+        "XXXX ",
+      ],
+      "C": [
+        " XXX ",
+        "X   X",
+        "X    ",
+        "X    ",
+        "X    ",
+        "X   X",
+        " XXX ",
+      ],
+      "D": [
+        "XXXX ",
+        "X   X",
+        "X   X",
+        "X   X",
+        "X   X",
+        "X   X",
+        "XXXX ",
+      ],
+      "E": [
+        "XXXXX",
+        "X    ",
+        "X    ",
+        "XXX  ",
+        "X    ",
+        "X    ",
+        "XXXXX",
+      ],
+      "F": [
+        "XXXXX",
+        "X    ",
+        "X    ",
+        "XXX  ",
+        "X    ",
+        "X    ",
+        "X    ",
+      ],
+      "G": [
+        " XXX ",
+        "X   X",
+        "X    ",
+        "X XXX",
+        "X   X",
+        "X   X",
+        " XXX ",
+      ],
+      "H": [
+        "X   X",
+        "X   X",
+        "X   X",
+        "XXXXX",
+        "X   X",
+        "X   X",
+        "X   X",
+      ],
+      "I": [
+        " XXX ",
+        "  X  ",
+        "  X  ",
+        "  X  ",
+        "  X  ",
+        "  X  ",
+        " XXX ",
+      ],
+      "J": [
+        "XXXXX",
+        "    X",
+        "    X",
+        "    X",
+        "    X",
+        "X   X",
+        " XXX ",
+      ],
+      "K": [
+        "X   X",
+        "X  X ",
+        "X X  ",
+        "XX   ",
+        "X X  ",
+        "X  X ",
+        "X   X",
+      ],
+      "L": [
+        "X    ",
+        "X    ",
+        "X    ",
+        "X    ",
+        "X    ",
+        "X    ",
+        "XXXXX",
+      ],
+      "M": [
+        "X   X",
+        "XX XX",
+        "X X X",
+        "X   X",
+        "X   X",
+        "X   X",
+        "X   X",
+      ],
+      "N": [
+        "X   X",
+        "XX  X",
+        "X X X",
+        "X  XX",
+        "X   X",
+        "X   X",
+        "X   X",
+      ],
+      "O": [
+        " XXX ",
+        "X   X",
+        "X   X",
+        "X   X",
+        "X   X",
+        "X   X",
+        " XXX ",
+      ],
+      "P": [
+        "XXXX ",
+        "X   X",
+        "X   X",
+        "XXXX ",
+        "X    ",
+        "X    ",
+        "X    ",
+      ],
+      "Q": [
+        " XXX ",
+        "X   X",
+        "X   X",
+        "X   X",
+        "X X X",
+        "X  X ",
+        " XX X",
+      ],
+      "R": [
+        "XXXX ",
+        "X   X",
+        "X   X",
+        "XXXX ",
+        "X X  ",
+        "X  X ",
+        "X   X",
+      ],
+      "S": [
+        " XXXX",
+        "X    ",
+        "X    ",
+        " XXX ",
+        "    X",
+        "    X",
+        "XXXX ",
+      ],
+      "T": [
+        "XXXXX",
+        "  X  ",
+        "  X  ",
+        "  X  ",
+        "  X  ",
+        "  X  ",
+        "  X  ",
+      ],
+      "U": [
+        "X   X",
+        "X   X",
+        "X   X",
+        "X   X",
+        "X   X",
+        "X   X",
+        " XXX ",
+      ],
+      "V": [
+        "X   X",
+        "X   X",
+        "X   X",
+        "X   X",
+        "X   X",
+        " X X ",
+        "  X  ",
+      ],
+      "W": [
+        "X   X",
+        "X   X",
+        "X   X",
+        "X X X",
+        "X X X",
+        "XX XX",
+        "X   X",
+      ],
+      "X": [
+        "X   X",
+        "X   X",
+        " X X ",
+        "  X  ",
+        " X X ",
+        "X   X",
+        "X   X",
+      ],
+      "Y": [
+        "X   X",
+        "X   X",
+        " X X ",
+        "  X  ",
+        "  X  ",
+        "  X  ",
+        "  X  ",
+      ],
+      "Z": [
+        "XXXXX",
+        "    X",
+        "   X ",
+        "  X  ",
+        " X   ",
+        "X    ",
+        "XXXXX",
+      ],
+      "0": [
+        " XXX ",
+        "X   X",
+        "XX  X",
+        "X X X",
+        "X  XX",
+        "X   X",
+        " XXX ",
+      ],
+      "1": [
+        "  X  ",
+        " XX  ",
+        "  X  ",
+        "  X  ",
+        "  X  ",
+        "  X  ",
+        " XXX ",
+      ],
+      "2": [
+        " XXX ",
+        "X   X",
+        "    X",
+        "   X ",
+        "  X  ",
+        " X   ",
+        "XXXXX",
+      ],
+      "3": [
+        "XXXX ",
+        "    X",
+        "   X ",
+        "  XX ",
+        "    X",
+        "    X",
+        "XXXX ",
+      ],
+      "4": [
+        "   X ",
+        "  XX ",
+        " X X ",
+        "X  X ",
+        "XXXXX",
+        "   X ",
+        "   X ",
+      ],
+      "5": [
+        "XXXXX",
+        "X    ",
+        "XXXX ",
+        "    X",
+        "    X",
+        "X   X",
+        " XXX ",
+      ],
+      "6": [
+        " XXX ",
+        "X   X",
+        "X    ",
+        "XXXX ",
+        "X   X",
+        "X   X",
+        " XXX ",
+      ],
+      "7": [
+        "XXXXX",
+        "    X",
+        "   X ",
+        "   X ",
+        "  X  ",
+        "  X  ",
+        "  X  ",
+      ],
+      "8": [
+        " XXX ",
+        "X   X",
+        "X   X",
+        " XXX ",
+        "X   X",
+        "X   X",
+        " XXX ",
+      ],
+      "9": [
+        " XXX ",
+        "X   X",
+        "X   X",
+        " XXXX",
+        "    X",
+        "X   X",
+        " XXX ",
+      ]
+    };
+
+    function generateEmojiArtHorizontal(text, fgEmoji, bgEmoji) {
+      const rowsPerChar = 7;
+      const fg = fgEmoji || "⬛️";
+      const bg = bgEmoji || "  ";
+      const outputRows = Array(rowsPerChar).fill("");
+
+      for (const rawChar of text.toUpperCase()) {
+        if (rawChar === " ") {
+          for (let r = 0; r < rowsPerChar; r++) {
+            outputRows[r] += "   ";
+          }
+          continue;
+        }
+
+        const pattern = LETTER_PATTERNS[rawChar];
+        if (!pattern) {
+          for (let r = 0; r < rowsPerChar; r++) {
+            if (r === 3) {
+              outputRows[r] += ` ${rawChar}   `;
+            } else {
+              outputRows[r] += "     ";
+            }
+          }
+          for (let r = 0; r < rowsPerChar; r++) {
+            outputRows[r] += " ";
+          }
+          continue;
+        }
+
+        for (let r = 0; r < rowsPerChar; r++) {
+          const rowPattern = pattern[r];
+          for (const cell of rowPattern) {
+            outputRows[r] += (cell === "X" ? fg : bg);
+          }
+          outputRows[r] += " ";
+        }
+      }
+
+      return outputRows.join("\n");
+    }
+
+    function generateEmojiArtVertical(text, fgEmoji, bgEmoji) {
+      const rowsPerChar = 7;
+      const fg = fgEmoji || "⬛️";
+      const bg = bgEmoji || "  ";
+      const blocks = [];
+
+      for (const rawChar of text.toUpperCase()) {
+        if (rawChar === " ") {
+          const blankBlock = Array(rowsPerChar).fill("     ");
+          blocks.push(blankBlock);
+          continue;
+        }
+
+        const pattern = LETTER_PATTERNS[rawChar];
+        const block = [];
+
+        if (!pattern) {
+          for (let r = 0; r < rowsPerChar; r++) {
+            if (r === 3) block.push(` ${rawChar}   `);
+            else block.push("     ");
+          }
+          blocks.push(block);
+          continue;
+        }
+
+        for (let r = 0; r < rowsPerChar; r++) {
+          let line = "";
+          for (const cell of pattern[r]) {
+            line += (cell === "X" ? fg : bg);
+          }
+          block.push(line);
+        }
+
+        blocks.push(block);
+      }
+
+      return blocks.map(block => block.join("\n")).join("\n\n");
+    }
+
+    function generateEmojiArt(text, fgEmoji, bgEmoji, layout) {
+      if (layout === "vertical") {
+        return generateEmojiArtVertical(text, fgEmoji, bgEmoji);
+      }
+      return generateEmojiArtHorizontal(text, fgEmoji, bgEmoji);
+    }
+
+    const textInput = document.getElementById("textInput");
+    const fgEmojiInput = document.getElementById("fgEmoji");
+    const bgEmojiInput = document.getElementById("bgEmoji");
+    const generateBtn = document.getElementById("generateBtn");
+    const copyBtn = document.getElementById("copyBtn");
+    const outputEl = document.getElementById("output");
+    const toastEl = document.getElementById("toast");
+    const layoutSelect = document.getElementById("layoutSelect");
+    const swapBtn = document.getElementById("swapBtn");
+    const emojiPicker = document.getElementById("emojiPicker");
+    const pickerTargetLabel = document.getElementById("pickerTargetLabel");
+
+    let currentEmojiTarget = "fg"; // "fg" or "bg"
+
+    function showToast() {
+      toastEl.style.display = "flex";
+      setTimeout(() => {
+        toastEl.style.display = "none";
+      }, 1200);
+    }
+
+    function updateEmojiTarget(target) {
+      currentEmojiTarget = target;
+      pickerTargetLabel.textContent = target === "fg" ? "Emoji 1" : "Emoji 2";
+      fgEmojiInput.classList.toggle("active", target === "fg");
+      bgEmojiInput.classList.toggle("active", target === "bg");
+    }
+
+    function updateArt() {
+      const text = textInput.value || "";
+      const fg = fgEmojiInput.value.trim() || "⬛️";
+      const bg = bgEmojiInput.value.trim() || "  ";
+      const layout = layoutSelect.value || "horizontal";
+      const art = generateEmojiArt(text, fg, bg, layout);
+      outputEl.textContent = art;
+    }
+
+    generateBtn.addEventListener("click", updateArt);
+    layoutSelect.addEventListener("change", updateArt);
+    textInput.addEventListener("input", updateArt);
+    fgEmojiInput.addEventListener("input", updateArt);
+    bgEmojiInput.addEventListener("input", updateArt);
+
+    fgEmojiInput.addEventListener("focus", () => updateEmojiTarget("fg"));
+    bgEmojiInput.addEventListener("focus", () => updateEmojiTarget("bg"));
+
+    swapBtn.addEventListener("click", () => {
+      const oldFg = fgEmojiInput.value;
+      fgEmojiInput.value = bgEmojiInput.value;
+      bgEmojiInput.value = oldFg;
+      // keep the current target label but update highlighting
+      updateEmojiTarget(currentEmojiTarget);
+      updateArt();
+    });
+
+    emojiPicker.addEventListener("click", (e) => {
+      if (!(e.target instanceof HTMLElement)) return;
+      if (!e.target.classList.contains("emoji-picker-btn")) return;
+
+      const emoji = e.target.textContent.trim();
+      if (!emoji) return;
+
+      const targetInput = currentEmojiTarget === "fg" ? fgEmojiInput : bgEmojiInput;
+      targetInput.value = emoji;
+      updateArt();
+      targetInput.focus();
+    });
+
+    copyBtn.addEventListener("click", async () => {
+      const text = outputEl.textContent || "";
+      if (!text.trim()) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast();
+      } catch (err) {
+        const range = document.createRange();
+        range.selectNodeContents(outputEl);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    });
+
+    // Initial state
+    updateEmojiTarget("fg");
+    updateArt();
+  </script>
+</body>
+</html>
